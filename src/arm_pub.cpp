@@ -1,62 +1,50 @@
-#include "ros/ros.h"
-#include "std_msgs/Int32MultiArray.h"
+#include <ros/ros.h>
+#include <std_msgs/Int32MultiArray.h>
+#include <chrono>
+#include <thread>
 
-int main(int argc, char **argv) {
-    // Initialize the ROS node
-    ros::init(argc, argv, "Arm_Positions");
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "arm_pubcpp");
+    ros::NodeHandle n;
 
-    // Create a ROS NodeHandle
-    ros::NodeHandle nh;
+    ros::Publisher arm_pub = n.advertise<std_msgs::Int32MultiArray>("Arm_Positions_Publisher", 10);
+    ros::Rate loop_rate(10);
 
-    // Create a publisher object
-    ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("Arm_Positions_Publisher", 10);
+    std_msgs::Int32MultiArray arm_msg;
 
+    arm_msg.layout.dim.push_back(std_msgs::MultiArrayDimension());
+    arm_msg.layout.dim[0].size = 3;
+    arm_msg.layout.dim[0].stride = 3;
+    arm_msg.layout.dim[0].label = "Arm_Positions";
 
-    // Set the loop rate (in Hz)
-    ros::Rate loop_rate(1); // 1 Hz
-
-    // Counter variable
-    int count = 0;
-    int grip=0;
-    while (ros::ok()) {
-        // Create a message object
-        std_msgs::Int32MultiArray msg;
-
-        // Set the array size to 3
-        msg.layout.dim.push_back(std_msgs::MultiArrayDimension());
-        msg.layout.dim[0].size = 3;
-        msg.layout.dim[0].stride = 3;
-        msg.layout.dim[0].label = "Arm_Positions";
-
-        // Add the integer values to the data array
-        msg.data.clear();
-        msg.data.push_back(0);
-        msg.data.push_back(0);
-        msg.data.push_back(grip);
-	
-        // Publish the message
-        pub.publish(msg);
-
-        // Log the published values
-        ROS_INFO("Published: [%d, %d, %d]", msg.data[0], msg.data[1], msg.data[2]);
-
-        // Increment the counter
-        count += 45; // Increment by 3 for the next set of values
-        if (grip == 0)
-        {
-        	grip = 1;
-        }
-        else
-        {
-        	grip = 0;
-        }
-        
-        // Spin once
-        ros::spinOnce();
-
-        // Sleep to maintain the loop rate
-        loop_rate.sleep();
+    while (arm_pub.getNumSubscribers() == 0)
+    {
+        ROS_INFO("Waiting for a subscriber to the 'cmd_arm' topic...");
+        ros::Duration(0.2).sleep();
     }
+
+    if (argc > 3) // Check for at least three command-line arguments
+    {
+        arm_msg.data.push_back(atoi(argv[1]));
+        arm_msg.data.push_back(atoi(argv[2]));
+        arm_msg.data.push_back(atoi(argv[3]));
+    }
+    else
+    {
+        ROS_INFO("Insufficient values provided. Publishing default values.");
+        arm_msg.data = {0, 0, 0};
+    }
+
+    ROS_INFO_STREAM("Publishing arm positions: " << arm_msg.data[0] << ", " << arm_msg.data[1] << ", " << arm_msg.data[2]);
+
+    arm_pub.publish(arm_msg);
+
+    // Process pending callbacks (optional)
+    ros::spinOnce();
+
+    // Sleep for the remaining time to maintain the desired loop rate
+    loop_rate.sleep();
 
     return 0;
 }
