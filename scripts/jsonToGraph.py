@@ -16,6 +16,10 @@ class Node:
     def add_adjacent(self, node):
         self.adjacent_nodes.append(node)
 
+    def atNode(self, coordinates) -> bool:
+        dist = np.sqrt((self.X - coordinates[0])**2 + (self.Y - coordinates[1])**2)
+        return dist < 0.1
+
     def __repr__(self):
         adjacent_ids = [node.id for node in self.adjacent_nodes]  # Collect only IDs of adjacent nodes
         return f"id={self.id}, label={self.label}, position=({self.pose}), adjacent_nodes={adjacent_ids}"
@@ -23,6 +27,7 @@ class Node:
 
 class Graph:
     def __init__(self, json_file):
+        self.origin_node = None
         self.nodes = []
         self.node_map = {}
         self.map_name = ""
@@ -43,6 +48,14 @@ class Graph:
         # Save cost matrix to file
         cost_mat_filename = os.getenv("MATRIX_DIR") + self.map_name + ".cost"
         np.savetxt(cost_mat_filename, self.cost_matrix)
+
+        # Get origin node of this graph
+        for n in self.nodes:
+            if n.X == 0 and n.Y == 0:
+                self.origin_node = n
+                break
+
+
 
 
     def __repr__(self) -> str:

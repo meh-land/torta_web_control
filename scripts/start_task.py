@@ -1,12 +1,14 @@
 #!/bin/python3
 # NOT TESTED
 from jsonToGraph import Graph
+from jsonToGraph import Node
 import jsonToTask as jt
 import os
 from dotenv import load_dotenv
 import sys
 import rospy
-from std_msgs.msg import String
+from geometry_msgs.msg import Pose
+import numpy as np
 
 # Get task name from command line arguments
 task_name = sys.argv[1]
@@ -18,6 +20,7 @@ load_dotenv()
 map_dir = os.getenv("MAPS_DIR")
 matrix_dir = os.getenv("MATRIX_DIR")
 tasks_dir = os.getenv("TASKS_DIR")
+logs_dir = os.getenv("LOGS_DIR")
 
 # Get task data
 task_file_name = task_name.strip() + ".json"
@@ -28,30 +31,23 @@ task = jt.readTask(task_file_path)
 map_file_name = task.map.strip() + ".json"
 map_file_path = map_dir + map_file_name
 graph = Graph(map_file_path)
+
+# Get optimal path (path is a list of nodes)
 path = graph.get_path(task.pickupNode.strip(), task.dropoffNode.strip()).nodes
 
+# Get my current location
+curr_pose = np.loadtxt(logs_dir + "pose.log")
+# pose.log should contain 0 0 0 at the beginning if it doesn't this means that this is not the firs run and we need to read the last row of data as our true curr_pose
+if curr_pose.size > 3:
+    curr_pose = curr_pose[-1]
 
-def talker():
-    # Initialize the ROS node with the name 'talker'
-    rospy.init_node('talker', anonymous=True)
-    # Create a Publisher object, publishing to the 'chatter' topic with String messages
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    # Set the loop rate in Hz (e.g., 10 Hz means 10 messages per second)
-    rate = rospy.Rate(1) # 10 Hz
-    while not rospy.is_shutdown():
-        # Create a string message with the current time
-        hello_str = f"n1 = {path[0].label}, {path[-1].label}"
-        # Log the message to the console
-        rospy.loginfo(hello_str)
-        # Publish the message to the 'chatter' topic
-        pub.publish(hello_str)
-        # Sleep for the remaining time to maintain the loop rate
-        rate.sleep()
-
-if __name__ == '__main__':
-    try:
-        talker()
-    except rospy.ROSInterruptException:
-        pass
+if not graph.origin_node.atNode(curr_pose):
+    # This means that we are not at the origin node, so me need to find the closest node to our location
+    for n in graph.nodes:
+        if n.atNode(curr_pose):
+            curr_node = n
+            break
+else:
+    curr_node = graph.origin_node
 
 
