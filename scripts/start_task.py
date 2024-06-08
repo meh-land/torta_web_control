@@ -1,7 +1,6 @@
 #!/bin/python3
 # NOT TESTED
 from jsonToGraph import Graph
-from jsonToGraph import Node
 import jsonToTask as jt
 import os
 from dotenv import load_dotenv
@@ -47,7 +46,15 @@ if not graph.origin_node.atNode(curr_pose):
         if n.atNode(curr_pose):
             curr_node = n
             break
+    # If the loop ends and I am not at any node, then I am between two nodes, I will ignore this case for now, but maybe come back to it later
+    #TODO: handle when between nodes
 else:
     curr_node = graph.origin_node
+
+# If my current node is not the pickup node, go to the pickup node
+if not curr_node == task.pickupNode:
+    path_to_pickup = graph.get_path(curr_node.label, task.pickupNode.label)
+    path = path_to_pickup + path[1:]
+
 
 
