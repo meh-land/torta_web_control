@@ -8,6 +8,7 @@ import sys
 import rospy
 from geometry_msgs.msg import Pose
 import numpy as np
+from time import sleep
 
 # Get task name from command line arguments
 task_name = sys.argv[1]
@@ -33,6 +34,9 @@ graph = Graph(map_file_path)
 
 # Get optimal path (path is a list of nodes)
 path = graph.get_path(task.pickupNode.strip(), task.dropoffNode.strip()).nodes
+# Task nodes are defined by their labels, but we can benefit from defining them as node objects
+task.pickupNode = path[0]
+task.dropoffNode = path[-1]
 
 # Get my current location
 curr_pose = np.loadtxt(logs_dir + "pose.log")
@@ -56,5 +60,23 @@ if not curr_node == task.pickupNode:
     path_to_pickup = graph.get_path(curr_node.label, task.pickupNode.label)
     path = path_to_pickup + path[1:]
 
+def goToNode():
+    ...
+
+def pickupLoad():
+    #TODO
+    sleep(10)
+
+def dropoffLoad():
+    #TODO
+    sleep(10)
+
+# Start walking of the path
+for n in path:
+    goToNode(n)
+    if curr_node == task.pickupNode:
+        pickupLoad()
+    elif curr_node == task.dropoffNode:
+       dropoffLoad() 
 
 
