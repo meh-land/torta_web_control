@@ -73,7 +73,7 @@ task.pickupNode = path[0]
 task.dropoffNode = path[-1]
 
 while curr_x is None:
-    rospy.spinOnce()
+    rospy.spin()
 
 # Get my current location
 curr_pose = [curr_x, curr_y, curr_theta]
@@ -114,7 +114,7 @@ def goToNode(n):
 
     # Wait till 10 cm of target
     while(abs(curr_y-target_y)>0.1):
-        rospy.spinOnce()
+        rospy.spin()
 
     # Stop
     vel_pub(0,0)
