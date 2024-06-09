@@ -31,12 +31,12 @@ def odom_callback(data):
     pos = data.pose.pose.position
     curr_x = pos.x
     curr_y = pos.y
-    rospy.loginfo("x: {}, y: {}".format(pos.x,pos.y))
+    # rospy.loginfo("x: {}, y: {}".format(pos.x,pos.y))
     
 def mpu_callback(data):
     global curr_theta
     curr_theta = data.data
-    rospy.loginfo("theta: {}".format(data.data))
+    # rospy.loginfo("theta: {}".format(data.data))
     
 # Init ros
 rospy.init_node("task_handler", anonymous=True)
@@ -79,7 +79,7 @@ while curr_x is None:
 # Get my current location
 curr_pose = [curr_x, curr_y, curr_theta]
 min_dist = None
-if  np.sqrt((curr_pose[0] + curr_pose[1])**2) > 0.1:
+if not graph.origin_node.atNode(curr_pose):
     # This means that we are not at the origin node, so me need to find the closest node to our location
     for n in graph.nodes:
         if min_dist is None or n.distToNode(curr_pose)<min_dist:
