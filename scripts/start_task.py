@@ -31,12 +31,12 @@ def odom_callback(data):
     pos = data.pose.pose.position
     curr_x = pos.x
     curr_y = pos.y
-    rospy.loginfo("x: {}, y: {}".format(pos.x,pos.y))
+    # rospy.loginfo("x: {}, y: {}".format(pos.x,pos.y))
     
 def mpu_callback(data):
     global curr_theta
     curr_theta = data.data
-    rospy.loginfo("theta: {}".format(data.data))
+    # rospy.loginfo("theta: {}".format(data.data))
     
 # Init ros
 rospy.init_node("task_handler", anonymous=True)
