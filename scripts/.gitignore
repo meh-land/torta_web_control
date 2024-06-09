@@ -2,3 +2,4 @@
 __*
 def_*.py
 .def_*.py
+.env

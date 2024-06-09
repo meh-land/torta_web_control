@@ -79,7 +79,7 @@ while curr_x is None:
 # Get my current location
 curr_pose = [curr_x, curr_y, curr_theta]
 min_dist = None
-if not graph.origin_node.atNode(curr_pose):
+if  np.sqrt((curr_pose[0] + curr_pose[1])**2) > 0.1:
     # This means that we are not at the origin node, so me need to find the closest node to our location
     for n in graph.nodes:
         if min_dist is None or n.distToNode(curr_pose)<min_dist:
