@@ -95,7 +95,9 @@ if not curr_node == task.pickupNode:
     path = path_to_pickup + path[1:]
 
 def goToNode(n):
-    target_x, target_y, target_theta = n
+    # target_x, target_y, target_theta = n
+    target_x = n.X
+    target_y = n.Y
     delta_x = (target_x-curr_x)
     delta_y = (target_y-curr_y)
 
