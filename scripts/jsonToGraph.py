@@ -19,7 +19,11 @@ class Node:
     def atNode(self, coordinates) -> bool:
         dist = np.sqrt((self.X - coordinates[0])**2 + (self.Y - coordinates[1])**2)
         return dist < 0.1
-
+    
+    def distToNode(self, coordinates) -> float:
+        dist = np.sqrt((self.X - coordinates[0])**2 + (self.Y - coordinates[1])**2)
+        return dist
+    
     def __repr__(self):
         adjacent_ids = [node.id for node in self.adjacent_nodes]  # Collect only IDs of adjacent nodes
         return f"id={self.id}, label={self.label}, position=({self.pose}), adjacent_nodes={adjacent_ids}"
