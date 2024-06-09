@@ -106,7 +106,7 @@ def goToNode(n):
 
     # Wait till in range of 10 cm of target
     while(abs(curr_x-target_x)<0.1):
-        rospy.spinOnce()
+        rospy.spin()
         continue
 
     # Move in direction of target y
