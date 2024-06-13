@@ -118,7 +118,7 @@ def goToNode(n):
     vel_pub(vel_vec[0], vel_vec[1])
     
     # Wait till in range of 10 cm of target
-    while(abs(curr_x-target_x)>0.1):
+    while(abs(curr_x-target_x)>0.01):
         # rospy.spin()
         continue
 
