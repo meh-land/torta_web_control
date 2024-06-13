@@ -90,23 +90,26 @@ if not graph.origin_node.atNode(curr_pose):
 else:
     curr_node = graph.origin_node
 
+curr_node = graph.origin_node
 # If my current node is not the pickup node, go to the pickup node
-if not curr_node == task.pickupNode:
-    path_to_pickup = graph.get_path(curr_node.label, task.pickupNode.label)
-    path = path_to_pickup + path[1:]
+#if not curr_node == task.pickupNode:
+#    path_to_pickup = graph.get_path(curr_node.label, task.pickupNode.label)
+#    path = path_to_pickup + path[1:]
 
 def goToNode(n):
     # target_x, target_y, target_theta = n
+    rospy.loginfo(f"current_odom = x: {curr_x}, y: {curr_y}")
+    rospy.loginfo(f"Target Node = x: {n.X}, y: {n.Y}")
     target_x = n.X
     target_y = n.Y
-    delta_x = (target_x-curr_x)
-    delta_y = (target_y-curr_y)
+    delta_x = (target_x-curr_x) + 1e-10
+    delta_y = (target_y-curr_y) + 1e-10
 
     # Move in direction of target x
     vel_pub(delta_x/abs(delta_x)*5,0)
 
     # Wait till in range of 10 cm of target
-    while(abs(curr_x-target_x)<0.1):
+    while(abs(curr_x-target_x)>0.1):
         # rospy.spin()
         continue
 
@@ -124,16 +127,19 @@ def goToNode(n):
 
 def pickupLoad():
     #TODO
+    rospy.loginfo(f"picking up")
     sleep(10)
 
 def dropoffLoad():
     #TODO
+    rospy.loginfo(f"dropping off")
     sleep(10)
 
 
 # Start walking of the path
 for n in path:
     goToNode(n)
+    curr_node = n
     if curr_node == task.pickupNode:
         pickupLoad()
     elif curr_node == task.dropoffNode:
