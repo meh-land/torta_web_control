@@ -16,6 +16,11 @@ curr_x = None
 curr_y = None
 curr_theta = None
 
+# Aux variables
+curr_pose_vec = np.zeros(2)
+target_pose_vec = np.zeros(2)
+vel_vec = np.zeros(2)
+
 
 def vel_pub(vel_x, vel_y, vel_theta=0):
     vel_msg = Twist()
@@ -102,22 +107,18 @@ def goToNode(n):
     rospy.loginfo(f"Target Node = x: {n.X}, y: {n.Y}")
     target_x = n.X
     target_y = n.Y
-    delta_x = (target_x-curr_x) + 1e-10
-    delta_y = (target_y-curr_y) + 1e-10
+    target_pose_vec[0] = n.X
+    target_pose_vec[1] = n.Y
+    curr_pose_vec[0] = curr_x
+    target_pose_vec[1] = curr_y
+    vel_vec = target_pose_vec - curr_pose_vec
+    vel_vec = 5 * vel_vec / (np.linalg.norm(vel_vec) + 1e-10)
 
-    # Move in direction of target x
-    vel_pub(delta_x/abs(delta_x)*5,0)
-
+    # Move in target direction
+    vel_pub(vel_vec[0], vel_vec[1])
+    
     # Wait till in range of 10 cm of target
     while(abs(curr_x-target_x)>0.1):
-        # rospy.spin()
-        continue
-
-    # Move in direction of target y
-    vel_pub(0,delta_y/abs(delta_y)*5)
-
-    # Wait till 10 cm of target
-    while(abs(curr_y-target_y)>0.1):
         # rospy.spin()
         continue
 
