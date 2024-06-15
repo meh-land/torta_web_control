@@ -36,6 +36,8 @@ def odom_callback(data):
     pos = data.pose.pose.position
     curr_x = pos.x
     curr_y = pos.y
+    curr_pose_vec[0] = curr_x 
+    curr_pose_vec[1] = curr_y 
     # rospy.loginfo("x: {}, y: {}".format(pos.x,pos.y))
     
 def mpu_callback(data):
@@ -110,15 +112,15 @@ def goToNode(n):
     target_pose_vec[0] = n.X
     target_pose_vec[1] = n.Y
     curr_pose_vec[0] = curr_x
-    target_pose_vec[1] = curr_y
+    curr_pose_vec[1] = curr_y
     vel_vec = target_pose_vec - curr_pose_vec
     vel_vec = 5 * vel_vec / (np.linalg.norm(vel_vec) + 1e-10)
 
     # Move in target direction
     vel_pub(vel_vec[0], vel_vec[1])
     
-    # Wait till in range of 10 cm of target
-    while(abs(curr_x-target_x)>0.01):
+    # Wait till in range of 1 cm of target
+    while(np.linalg.norm(target_pose_vec - curr_pose_vec)>0.01):
         # rospy.spin()
         continue
 
