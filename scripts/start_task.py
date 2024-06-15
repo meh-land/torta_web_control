@@ -120,7 +120,7 @@ def goToNode(n):
     vel_pub(vel_vec[0], vel_vec[1])
     
     # Wait till in range of 1 cm of target
-    while(np.linalg.norm(target_pose_vec - curr_pose_vec)>0.01):
+    while(np.linalg.norm(target_pose_vec - curr_pose_vec) > 10e-2):
         # rospy.spin()
         continue
 
