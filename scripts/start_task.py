@@ -21,6 +21,10 @@ curr_pose_vec = np.zeros(2)
 target_pose_vec = np.zeros(2)
 vel_vec = np.zeros(2)
 
+def write_logs(log_str):
+    global logs_file
+    with open(logs_file, 'a') as file:
+        file.write(log_str + "\n")
 
 def vel_pub(vel_x, vel_y, vel_theta=0):
     vel_msg = Twist()
@@ -62,6 +66,7 @@ map_dir = os.getenv("MAPS_DIR")
 matrix_dir = os.getenv("MATRIX_DIR")
 tasks_dir = os.getenv("TASKS_DIR")
 logs_dir = os.getenv("LOGS_DIR")
+logs_file = logs_dir + "Logs.txt"
 
 # Get task data
 task_file_name = task_name.strip() + ".json"
@@ -130,16 +135,19 @@ def goToNode(n):
 
 def pickupLoad():
     #TODO
-    rospy.loginfo(f"picking up")
+    rospy.loginfo("picking up")
+    write_logs("picking up")
     sleep(10)
 
 def dropoffLoad():
     #TODO
-    rospy.loginfo(f"dropping off")
+    rospy.loginfo("dropping off")
+    write_logs("dropping off")
     sleep(10)
 
 
 # Start walking of the path
+write_logs(f"Starting Task: {task_name}")
 for n in path:
     goToNode(n)
     curr_node = n
@@ -147,4 +155,4 @@ for n in path:
         pickupLoad()
     elif curr_node == task.dropoffNode:
        dropoffLoad() 
-
+write_logs(f"End Task: {task_name}")
