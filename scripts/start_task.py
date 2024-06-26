@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import sys
 import rospy
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Int16
 from nav_msgs.msg import Odometry
 import numpy as np
 from time import sleep
@@ -52,6 +53,7 @@ def mpu_callback(data):
 # Init ros
 rospy.init_node("task_handler", anonymous=True)
 pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
+arm_pub = rospy.Publisher("cmd_arm", Int16, queue_size=10)
 rospy.Subscriber("odom", Odometry, odom_callback)
 rospy.Subscriber("Mpu", Odometry, mpu_callback)
 
@@ -134,16 +136,16 @@ def goToNode(n):
 
 
 def pickupLoad():
-    #TODO
     rospy.loginfo("picking up")
     write_logs("picking up")
-    sleep(10)
+    arm_pub.publish(1)
+    sleep(2)
 
 def dropoffLoad():
-    #TODO
     rospy.loginfo("dropping off")
     write_logs("dropping off")
-    sleep(10)
+    arm_pub.publish(0)
+    sleep(2)
 
 
 # Start walking of the path
