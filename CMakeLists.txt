@@ -218,3 +218,6 @@ target_link_libraries(arm_pub ${catkin_LIBRARIES})
 
 add_executable(sample_sender src/sample_sender.cpp)
 target_link_libraries(sample_sender ${catkin_LIBRARIES})
+
+add_executable(Prevent_Crash src/Prevent_Crash.cpp)
+target_link_libraries(Prevent_Crash ${catkin_LIBRARIES})
