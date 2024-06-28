@@ -12,7 +12,7 @@ bool IS_STOPPED = false;
 ros::Publisher vel_pub;
 
 bool need_stop(float us_reading){
-	return (us_reading < 10) && (us_reading > 0.1);
+	return (us_reading < 10) && (us_reading > 0.1) && !IS_STOPPED;
 }
 // Callback function for processing ultrasonic sensor data
 void Callback_Position(const std_msgs::Float32MultiArray::ConstPtr& Distances)
@@ -21,12 +21,13 @@ void Callback_Position(const std_msgs::Float32MultiArray::ConstPtr& Distances)
   if (need_stop(Distances->data[0]) || need_stop(Distances->data[1]) || need_stop(Distances->data[2]) || need_stop(Distances->data[3]))
   {
     // Stop the robot by setting linear and angular velocities to 0
+    old_Speed=received_speed;
     Speed.linear.x = 0.0;
     Speed.linear.y = 0.0;
     Speed.angular.z = 0.0;
-    IS_STOPPED = true;
-    old_Speed=received_speed;
     vel_pub.publish(Speed);
+    IS_STOPPED = true;
+    ROS_INFO("stopped");
   }
   else
   {
@@ -35,6 +36,7 @@ void Callback_Position(const std_msgs::Float32MultiArray::ConstPtr& Distances)
     {
     	IS_STOPPED = false;
 	vel_pub.publish(old_Speed);
+    	ROS_INFO("resume motion");
     }
   }
 }
@@ -43,7 +45,9 @@ void Callback_Position(const std_msgs::Float32MultiArray::ConstPtr& Distances)
 void Callback_Speed(const geometry_msgs::Twist::ConstPtr& speed_msg)
 {
   // Store the received speed values
-  received_speed = *speed_msg;
+  if (!IS_STOPPED){
+  	received_speed = *speed_msg;
+  }
 }
 
 int main(int argc, char **argv)
