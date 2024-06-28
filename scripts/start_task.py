@@ -133,6 +133,7 @@ def goToNode(n):
 
     # Stop
     vel_pub(0,0)
+    sleep(1)
 
 
 def pickupLoad():
