@@ -5,12 +5,12 @@ from std_msgs.msg import Float32MultiArray
 from geometry_msgs.msg import Twist
 
 IS_STOPPED = False
-front = 0
-back = 1
-right = 2
-left = 3
-curr_vel = None
-old_vel = None
+front = 1
+back = 0
+right = 3
+left = 2
+curr_vel = Twist()
+old_vel = Twist()
 rospy.init_node("prev_crash", anonymous=True)
 vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
 
@@ -33,11 +33,12 @@ def us_callback(data):
     bns = need_stop(readings[back])
     rns = need_stop(readings[right])
     lns = need_stop(readings[left])
-    if (fns or bns or rns or lns) and not IS_STOPPED:
+    #TODO: Add left after US fix
+    if (fns or bns or rns) and not IS_STOPPED:
         old_vel = curr_vel
         vel_pub_func(0,0)
         IS_STOPPED = True
-        rospy.loginfo("stopped")
+        rospy.loginfo(f"stopped {fns}, {bns}, {lns}")
     elif (fns or bns or rns or lns) and IS_STOPPED:
         return
     elif not (fns or bns or rns or lns) and IS_STOPPED:
