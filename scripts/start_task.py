@@ -11,6 +11,7 @@ from std_msgs.msg import Int16
 from nav_msgs.msg import Odometry
 import numpy as np
 from time import sleep
+import time
 
 # Init variables
 curr_x = None
@@ -21,6 +22,15 @@ curr_theta = None
 curr_pose_vec = np.zeros(2)
 target_pose_vec = np.zeros(2)
 vel_vec = np.zeros(2)
+
+def sleep_until(date_string):
+    # Parse the input string into a datetime object
+    target_time = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+    current_time = datetime.now()
+    time_difference = (target_time - current_time).total_seconds()
+    # Sleep until the target time
+    if time_difference > 0:
+        sleep(time_difference)
 
 def write_logs(log_str):
     global logs_file
@@ -148,7 +158,7 @@ def dropoffLoad():
     arm_pub.publish(0)
     sleep(2)
 
-
+sleep_until(task.time)
 # Start walking of the path
 write_logs(f"Starting Task: {task_name}")
 for n in path:
